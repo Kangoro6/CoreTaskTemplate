@@ -22,9 +22,17 @@ public class UserServiceImpl extends Util implements UserService {
                 "\t\tprimary key (id)\n" +
                 ");";
         try {
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
     }
@@ -34,9 +42,17 @@ public class UserServiceImpl extends Util implements UserService {
         String sql = "drop table if exists users";
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
     }
@@ -47,16 +63,26 @@ public class UserServiceImpl extends Util implements UserService {
                 "VALUES (?, ?, ?)";
 
         try {
+            connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setString(1,name);
             preparedStatement.setString(2,lastName);
             preparedStatement.setByte(3,age);
+
             preparedStatement.executeUpdate();
+            connection.commit();
+            connection.setAutoCommit(true);
             System.out.println("User с именем " + name + " добавлен в таблицу.");
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
+
     }
 
     public void removeUserById(long id) {
@@ -65,7 +91,7 @@ public class UserServiceImpl extends Util implements UserService {
 
     public List<User> getAllUsers() {
         List<User> usersList = new ArrayList<>();
-        Statement statement = null;
+        Statement statement;
         String sql = "select id, name, lastName, age from users";
         try {
             statement = connection.createStatement();
@@ -92,9 +118,17 @@ public class UserServiceImpl extends Util implements UserService {
         String sql = "truncate table users";
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
     }

@@ -26,9 +26,17 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
                 "\t\tprimary key (id)\n" +
                 ");";
         try {
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
     }
@@ -38,9 +46,17 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         String sql = "drop table if exists users";
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
     }
@@ -51,14 +67,23 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
                 "VALUES (?, ?, ?)";
 
         try {
+            connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setString(1,name);
             preparedStatement.setString(2,lastName);
             preparedStatement.setByte(3,age);
+
             preparedStatement.executeUpdate();
+            connection.commit();
+            connection.setAutoCommit(true);
             System.out.println("User с именем " + name + " добавлен в таблицу.");
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
     }
@@ -96,9 +121,17 @@ public class UserDaoJDBCImpl extends Util implements UserDao {
         String sql = "truncate table users";
 
         try {
+            connection.setAutoCommit(false);
             statement = connection.createStatement();
             statement.executeUpdate(sql);
+            connection.commit();
+            connection.setAutoCommit(true);
         } catch (SQLException throwables) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             throwables.printStackTrace();
         }
     }
