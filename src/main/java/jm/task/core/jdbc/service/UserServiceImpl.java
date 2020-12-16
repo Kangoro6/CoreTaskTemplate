@@ -1,14 +1,24 @@
 package jm.task.core.jdbc.service;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.util.List;
+
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 public class UserServiceImpl extends Util implements UserService {
-    Connection connection = getConnection();
+    SessionFactory sessionFactory = getSessionFactory();
+    Connection connection = this.getConnection();
+
+    public UserServiceImpl() {
+
+    }
 
     public void createUsersTable() {
         Statement statement;
@@ -39,12 +49,12 @@ public class UserServiceImpl extends Util implements UserService {
 
     public void dropUsersTable() {
         Statement statement;
-        String sql = "drop table if exists users";
+        String dropSql = "drop table if exists users";
 
         try {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
-            statement.executeUpdate(sql);
+            statement.executeUpdate(dropSql);
             connection.commit();
             connection.setAutoCommit(true);
         } catch (SQLException throwables) {
@@ -58,78 +68,47 @@ public class UserServiceImpl extends Util implements UserService {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        PreparedStatement preparedStatement;
-        String sql = "insert into users (name, lastName, age) " +
-                "VALUES (?, ?, ?)";
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
 
-        try {
-            connection.setAutoCommit(false);
-            preparedStatement = connection.prepareStatement(sql);
+        User user = new User(name, lastName, age);
+        session.save(user);
 
-            preparedStatement.setString(1,name);
-            preparedStatement.setString(2,lastName);
-            preparedStatement.setByte(3,age);
+        session.getTransaction().commit();
 
-            preparedStatement.executeUpdate();
-            connection.commit();
-            connection.setAutoCommit(true);
-            System.out.println("User с именем " + name + " добавлен в таблицу.");
-        } catch (SQLException throwables) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            throwables.printStackTrace();
-        }
-
+        System.out.println("User с именем " + name + " добавлен в таблицу.");
     }
 
     public void removeUserById(long id) {
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
 
+        User user = session.get(User.class, id);
+        session.delete(user);
+
+        session.getTransaction().commit();
     }
 
     public List<User> getAllUsers() {
-        List<User> usersList = new ArrayList<>();
-        Statement statement;
-        String sql = "select id, name, lastName, age from users";
-        try {
-            statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
 
-            while(resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("name"));
-                user.setLastName(resultSet.getString("lastName"));
-                user.setAge(resultSet.getByte("age"));
+        List<User> usersList = session.createQuery("from User").getResultList();
 
-                usersList.add(user);
-            }
-            System.out.println(usersList);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        for (User u : usersList) {
+            System.out.println(u);
         }
+
+        session.getTransaction().commit();
         return usersList;
     }
 
     public void cleanUsersTable() {
-        Statement statement;
-        String sql = "truncate table users";
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
 
-        try {
-            connection.setAutoCommit(false);
-            statement = connection.createStatement();
-            statement.executeUpdate(sql);
-            connection.commit();
-            connection.setAutoCommit(true);
-        } catch (SQLException throwables) {
-            try {
-                connection.rollback();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            throwables.printStackTrace();
-        }
+        session.createQuery("delete User").executeUpdate();
+
+        session.getTransaction().commit();
     }
 }
