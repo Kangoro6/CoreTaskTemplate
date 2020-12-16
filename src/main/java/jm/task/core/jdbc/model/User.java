@@ -1,26 +1,39 @@
 package jm.task.core.jdbc.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users"
+)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(
+            strategy = GenerationType.IDENTITY
+    )
+    @Column(
+            name = "id"
+    )
     private Long id;
-
-    @Column(name = "name")
+    @Column(
+            name = "name"
+    )
     private String name;
-
-    @Column(name = "lastName")
+    @Column(
+            name = "lastName"
+    )
     private String lastName;
-
-    @Column(name = "age")
+    @Column(
+            name = "age"
+    )
     private Byte age;
 
     public User() {
-
     }
 
     public User(String name, String lastName, Byte age) {
@@ -30,7 +43,7 @@ public class User {
     }
 
     public Long getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Long id) {
@@ -38,7 +51,7 @@ public class User {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -46,7 +59,7 @@ public class User {
     }
 
     public String getLastName() {
-        return lastName;
+        return this.lastName;
     }
 
     public void setLastName(String lastName) {
@@ -54,20 +67,14 @@ public class User {
     }
 
     public Byte getAge() {
-        return age;
+        return this.age;
     }
 
     public void setAge(Byte age) {
         this.age = age;
     }
 
-    @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", age=" + age +
-                '}';
+        return "User{id=" + this.id + ", name='" + this.name + '\'' + ", lastName='" + this.lastName + '\'' + ", age=" + this.age + '}';
     }
 }
